@@ -4,8 +4,16 @@
  * You'll have to figure out a way to export this function from
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
+  // var ObjectID = require('mongodb').ObjectID;
+
   var serverData = {
-    'results':[]
+    'results':[{createdAt: "2014-08-12T02:50:00.986Z",
+      objectId: "fi0Y89DA3a",
+      roomname: "lobby",
+      message: "test",
+      updatedAt: "2014-08-12T02:50:00.986Z",
+      username: "jon"}
+    ]
   };
 
 var handleRequest = function(request, response) {
@@ -15,7 +23,7 @@ var handleRequest = function(request, response) {
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
   console.log("Serving request type " + request.method + " for url " + request.url);
-  var statusCode = 404;
+  var statusCode = 200;
 
   if(request.method === 'GET'){
     if(request.url === '/classes/messages' || request.url === '/classes/room'){
@@ -24,19 +32,27 @@ var handleRequest = function(request, response) {
   }
 
   if(request.method === 'POST'){
-    if(request.url === '/classes/messages' || request.url === '/classes/room'){
+    //if(request.url === '/classes/messages' || request.url === '/classes/room'){
       statusCode = 201;
 
       request.on('data',function(data){
         var parsedData = JSON.parse(data);
+        // console.log(new ObjectID());
+        console.log("------------------------------------------PARSED DATA :"+ data)
         var newMessage = {};
         newMessage.username = parsedData['username'];
         newMessage.message = parsedData['message'];
+        newMessage.roomname = parsedData['roomname'];
+        var now = new Date();
+        newMessage.createdAt = now.toJSON();
+        newMessage.updatedAt = now.toJSON();
+        newMessage.objectId = JSON.stringify(Math.random() * now.valueOf());
+        // console.log(newMessage);
         serverData.results.push(newMessage);
 
       });
 
-    }
+    //}
   }
 
   /* Without this line, this server wouldn't work. See the note
