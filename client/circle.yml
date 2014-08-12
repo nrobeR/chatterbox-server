@@ -1,0 +1,11 @@
+machine:
+  environment:
+    DOWNSTREAM: hackreactor/chatterbox-client
+dependencies:
+  pre:
+    - npm install -g hackreactor-labs/problemify
+deployment:
+  master:
+    branch: master
+    commands:
+      - .bin/publish.sh
