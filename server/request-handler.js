@@ -14,36 +14,30 @@ var handleRequest = function(request, response) {
 
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
-
-
-  console.log("REQUEST URL IS: "+request.url);
+  console.log("Serving request type " + request.method + " for url " + request.url);
   var statusCode = 404;
 
   if(request.method === 'GET'){
-    if(request.url === '/classes/messages'){
-      statusCode = 200;
-    }
-    if(request.url === '/classes/room'){
+    if(request.url === '/classes/messages' || request.url === '/classes/room'){
       statusCode = 200;
     }
   }
 
   if(request.method === 'POST'){
-    request.on('data',function(data){
-      var parsedData = JSON.parse(data);
-      var newMessage = {};
-      newMessage.username = parsedData['username'];
-      newMessage.message = parsedData['message'];
-      serverData.results.push(newMessage);
-    });
-    //if(request.url === 'classes/messages'){
-    statusCode = 201;
-    //}
+    if(request.url === '/classes/messages' || request.url === '/classes/room'){
+      statusCode = 201;
+
+      request.on('data',function(data){
+        var parsedData = JSON.parse(data);
+        var newMessage = {};
+        newMessage.username = parsedData['username'];
+        newMessage.message = parsedData['message'];
+        serverData.results.push(newMessage);
+
+      });
+
+    }
   }
-
-  console.log("Serving request type " + request.method + " for url " + request.url);
-
-
 
   /* Without this line, this server wouldn't work. See the note
    * below about CORS. */
@@ -53,14 +47,13 @@ var handleRequest = function(request, response) {
 
   /* .writeHead() tells our server what HTTP status code to send back */
   response.writeHead(statusCode, headers);
-  //response.statusCode = statusCode;
 
   /* Make sure to always call response.end() - Node will not send
    * anything back to the client until you do. The string you pass to
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
-
   response.end(JSON.stringify(serverData));
+
 };
 module.exports = handleRequest;
 /* These headers will allow Cross-Origin Resource Sharing (CORS).
